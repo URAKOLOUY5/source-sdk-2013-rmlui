@@ -1,0 +1,34 @@
+"GameInfo"
+{
+	game 		"RmlUi Tests"
+	type		singleplayer_only
+
+	FileSystem
+	{
+		SteamAppId				243730
+
+		SearchPaths
+		{
+			game+mod			ep2/custom/*
+			game+mod			episodic/custom/*
+			game+mod			hl2/custom/*
+
+
+			game+mod+mod_write+default_write_path		|gameinfo_path|.
+			gamebin										|gameinfo_path|bin
+
+			game+mod			ep2/ep2_english.vpk
+			game+mod			ep2/ep2_pak.vpk
+			game				|all_source_engine_paths|episodic/ep1_english.vpk
+			game				|all_source_engine_paths|episodic/ep1_pak.vpk
+			game				|all_source_engine_paths|hl2/hl2_english.vpk
+			game				|all_source_engine_paths|hl2/hl2_pak.vpk
+			game				|all_source_engine_paths|hl2/hl2_textures.vpk
+			game				|all_source_engine_paths|hl2/hl2_sound_vo_english.vpk
+			game				|all_source_engine_paths|hl2/hl2_sound_misc.vpk
+			game				|all_source_engine_paths|hl2/hl2_misc.vpk
+			platform			|all_source_engine_paths|platform/platform_misc.vpk
+			platform			|all_source_engine_paths|platform
+		}
+	}
+}

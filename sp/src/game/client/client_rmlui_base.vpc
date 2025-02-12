@@ -1,0 +1,40 @@
+//-----------------------------------------------------------------------------
+//	CLIENT_RMLUI_BASE.VPC
+//
+//	Include Script for RmlUi
+//-----------------------------------------------------------------------------
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;./rmlui;$SRCDIR/thirdparty/rmlui/include"
+		$PreprocessorDefinitions		"$BASE;RMLUI"
+	}
+}
+
+$Project
+{
+	$Folder	"Source Files"
+	{
+		$Folder "RmlUi"
+		{
+			$File	"rmlui/rmlui_filesysteminterface.cpp"		
+			$File	"rmlui/rmlui_filesysteminterface.h"
+			$File	"rmlui/rmlui_manager.cpp"
+			$File	"rmlui/rmlui_manager.h"
+			$File	"rmlui/rmlui_panel.cpp"
+			$File	"rmlui/rmlui_panel.h"
+			$File	"rmlui/rmlui_renderinterface.cpp"
+			$File	"rmlui/rmlui_renderinterface.h"
+			$File	"rmlui/rmlui_systeminterface.cpp"
+			$File	"rmlui/rmlui_systeminterface.h"
+		}
+	}
+	
+	$Folder	"Link Libraries"
+	{
+		$Lib rmlui
+		$Lib rmlui_debugger
+	}
+}

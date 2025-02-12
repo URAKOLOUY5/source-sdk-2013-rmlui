@@ -1,0 +1,79 @@
+// RMLUI_GRADIENT_PS2X.FXC
+//
+// This file implements gradient shader
+// Based off https://github.com/mikke89/RmlUi/blob/master/Backends/RmlUi_Renderer_GL3.cpp
+// ------------------------------------------------------------
+
+#include "common_ps_fxc.h"
+
+// Gradient type definitions.
+#define LINEAR             0
+#define RADIAL             1
+#define CONIC              2
+#define REPEATING_LINEAR   3
+#define REPEATING_RADIAL   4
+#define REPEATING_CONIC    5
+#define PI                 3.14159265
+
+// Combos as shader constants
+const float4 gParams       : register(c0);  // x: FUNC, y: NUM_STOPS
+const float4 gP_V          : register(c1);  // xy: P, zw: V
+const float4 gStopColors[8] : register(c2); // Up to 4 stop colors (RGBA)
+const float gStopPositions[8] : register(c10); // Stop positions
+
+// PS_INPUT structure
+struct PS_INPUT
+{
+    float4 color    : COLOR0;
+    float2 texCoord : TEXCOORD0;
+};
+
+// Helper function: blends color stops based on t.
+float4 mix_stop_colors(float t)
+{
+    float numStops = gParams.y;
+    float4 color = gStopColors[0];
+    for (int i = 1; i < numStops; i++)
+    {
+        float factor = smoothstep(gStopPositions[i-1], gStopPositions[i], t);
+        color = lerp(color, gStopColors[i], factor);
+    }
+    return color;
+}
+
+// Main pixel shader function.
+float4 main(const PS_INPUT i) : SV_Target
+{
+    float t = 0.0;
+    float2 fragTexCoord = i.texCoord;
+    
+    int func = (int)gParams.x;
+    
+    if (func == LINEAR || func == REPEATING_LINEAR)
+    {
+        float2 V = fragTexCoord - gP_V.xy;
+        t = dot(gP_V.zw, V) / dot(gP_V.zw, gP_V.zw);
+    }
+    else if (func == RADIAL || func == REPEATING_RADIAL)
+    {
+        float2 V = fragTexCoord - gP_V.xy;
+        float2 radii = max(gP_V.zw, 1e-5); // Avoid division by zero
+        t = length(V / radii); // Normalize for elliptical gradients
+    }
+    else if (func == CONIC || func == REPEATING_CONIC)
+    {
+        float2x2 R = float2x2(gP_V.z, -gP_V.w, gP_V.w, gP_V.z);
+        float2 V = mul(R, (fragTexCoord - gP_V.xy));
+        t = 0.5 + atan2(-V.x, V.y) / (2.0 * PI);
+    }
+    
+    if (func == REPEATING_LINEAR || func == REPEATING_RADIAL || func == REPEATING_CONIC)
+    {
+        float t0 = gStopPositions[0];
+        float t1 = gStopPositions[(int)gParams.y - 1];
+        t = t0 + frac(t - t0) * (t1 - t0);
+    }
+    
+    float4 gradColor = mix_stop_colors(t);
+    return i.color * gradColor;
+}

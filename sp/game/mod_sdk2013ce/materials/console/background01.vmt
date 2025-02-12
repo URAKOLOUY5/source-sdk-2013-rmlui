@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	$basetexture "console/background01"
+
+	$no_fullbright 1
+}
