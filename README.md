@@ -9,6 +9,8 @@
     Mockup Garry's Mod menu featuring linear-gradient, position: absolute, display: flex
 </h5>
 
+**Note:** For implementation find `#ifdef RMLUI` in code,`client_rmlui_base.vpc` file and `src/game/client/rmlui` folder
+
 # Rendering features:
 |     | Feature         | Description                                                                               | Required by properties                                                                                                                                                                              |
 | --- | --------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
