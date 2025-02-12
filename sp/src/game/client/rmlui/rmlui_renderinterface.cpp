@@ -79,6 +79,13 @@ void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, 
         m_pGeometryMaterial.Init(mat);
     }
 
+    // Setup wireframe material for geometry
+    if (!m_pWireframeMaterial)
+    {
+        IMaterial* wireframeRef = materials->FindMaterial("debug/debugwireframevertexcolor", TEXTURE_GROUP_OTHER);
+        m_pWireframeMaterial.Init(wireframeRef);
+    }
+
     CMatRenderContextPtr pRenderContext(materials);
 
     pRenderContext->MatrixMode(MATERIAL_MODEL);
@@ -203,13 +210,6 @@ Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(Rml::Span<const Rml::by
     IMaterial* pMaterial = materials->CreateMaterial(pName, pVMTKeyValues);
 
     handle->material.Init(pMaterial);
-
-    // Setup wireframe material for geometry
-    if (!m_pWireframeMaterial)
-    {
-        IMaterial* wireframeRef = materials->FindMaterial("debug/debugwireframevertexcolor", TEXTURE_GROUP_OTHER);
-        m_pWireframeMaterial.Init(wireframeRef);
-    }
 
     return reinterpret_cast<Rml::TextureHandle>(handle);
 }
