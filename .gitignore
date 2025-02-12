@@ -32,9 +32,6 @@ ipch
 x64/
 x86/
 bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
 
 # OSX/Linux build products
 *.mak
