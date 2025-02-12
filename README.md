@@ -1,12 +1,10 @@
-![rmlonsourcesdk](https://github.com/user-attachments/assets/430c5b9e-3d8c-4ed3-b013-cfe44d404c59)
+![rmlonsourcesdk](https://github.com/user-attachments/assets/9d5fa7ad-71f3-4fba-bb1c-99d9187ee465)
 
 <h1 align="center">
     RmlUI Integration for Source SDK 2013
 </h1>
 
-
-
-![mockup-gmod](https://github.com/user-attachments/assets/d9c81b96-64fc-4cfb-b008-2a1db7ff1def)
+![mockup-gmod](https://github.com/user-attachments/assets/2e69860c-36b6-4e87-8cf6-4c1fdf9573d3)
 <h5 align="center">
     Mockup Garry's Mod menu featuring linear-gradient, position: absolute, display: flex
 </h5>
@@ -51,5 +49,6 @@ Check **Issues** tab for more info!
 # Credits
 - **[source-sdk-2013-ce](https://github.com/Nbc66/source-sdk-2013-ce)** - repository is based on this project and forked off
 - **[RmlUI](https://github.com/mikke89/RmlUi)** - framework itself, compiled as dynamic library using CMake (temp solution, later I want to integrate RmlUI as submodule and setup CMake here) + samples + wiki
+- **[SCell555's ShaderCompiler](https://github.com/SCell555/ShaderCompile)** - standalone shadercompile without dependencies on external tools (Perl, DxSDK)
 
 Check `thirdpartylegalnotices.txt` for licenses.
