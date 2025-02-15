@@ -5,52 +5,6 @@
 </head>
 <body>
 	<h1>Welcome to RmlUi</h1>
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
-	<div class="damage-overlay">Hello</div>	
+	<div class="damage-overlay">Hello</div>		
 </body>
 </rml>

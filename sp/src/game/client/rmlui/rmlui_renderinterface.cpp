@@ -76,7 +76,7 @@ void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, 
         pVMTKeyValues->SetInt("$ignorez", 1); // Ignore depth
         pVMTKeyValues->SetInt("$translucent", 1); // Enable transparency
         pVMTKeyValues->SetInt("$no_fullbright", 1); // Ignore fullbright
-        IMaterial* mat = g_pMaterialSystem->CreateMaterial("__rml_geometry", pVMTKeyValues);
+        IMaterial* mat = materials->CreateMaterial("__rml_geometry", pVMTKeyValues);
         m_pGeometryMaterial.Init(mat);
     }
 
@@ -260,25 +260,21 @@ void RmlUIRenderInterface::ReleaseTexture(Rml::TextureHandle texture)
         CTextureReference textureRef = handle->texture;
         KeyValues* keyValuesRef = handle->keyvalues;
 
-        const char* name = materialRef->GetName();
-
         if (textureRef)
         {
-            Msg("textureRef.Shutdown\n");
             textureRef->SetTextureRegenerator(NULL);
             textureRef->DecrementReferenceCount();
         }
 
         if (materialRef)
         {
-            Msg("MaterialRef.Shutdown\n");
             materialRef->DecrementReferenceCount();
-            materialRef.Shutdown();
+            materialRef = nullptr;
         }
 
         if (keyValuesRef)
         {
-            Msg("keyValuesRef->deleteThis\n");
+            // Actually it's useless to store and delete it but :idk:
             keyValuesRef->deleteThis();
         }
 
@@ -476,7 +472,7 @@ Rml::CompiledShaderHandle RmlUIRenderInterface::CompileShader(const Rml::String&
             pVMTKeyValues->SetFloat(stopPositionParam, stop.position.number);
         }
 
-        IMaterial* mat = g_pMaterialSystem->FindProceduralMaterial(pMaterialName, TEXTURE_GROUP_OTHER, pVMTKeyValues);
+        IMaterial* mat = materials->FindProceduralMaterial(pMaterialName, TEXTURE_GROUP_OTHER, pVMTKeyValues);
         mat->IncrementReferenceCount();
         shaderHandle->material.Init(mat);
         shaderHandle->keyvalues = pVMTKeyValues;
