@@ -1,0 +1,9 @@
+<rml>
+<head>
+    <link type="text/rcss" href="rml.rcss"/>
+	<link type="text/template" href="damageoverlay.rml" />
+</head>
+<body>
+	<h1>Welcome to RmlUi</h1>	
+</body>
+</rml>

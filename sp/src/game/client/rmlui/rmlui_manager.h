@@ -35,12 +35,12 @@
 
 class RmlUIManager {
 private:
-    Rml::Context* pContext;
     static RmlUIManager* instance;
     RmlUiPanel* rmlPanel;
     
     RmlUIManager();
     void LoadFontFaces();
+    std::map<const char*, Rml::Context*> contexts;
 
 public:
     RmlUIManager(const RmlUIManager&) = delete;
@@ -49,7 +49,12 @@ public:
 
     static RmlUIManager* GetInstance();
     void Init();
-    void Render();
+    void Render(const char* contextName);
+    void Shutdown();
+    
+    Rml::Context* CreateContext(const char* contextName, Rml::String documentName);
+    Rml::Context* GetContext(const char* contextName);
+
     void OnScreenSizeChanged(int iOldWide, int iOldTall);
     void OnCursorMoved(int x, int y);
     void OnMousePressed(vgui::MouseCode code);
@@ -60,7 +65,7 @@ public:
     void OnKeyCodeReleased(ButtonCode_t keynum);
     void OnKeyTyped(wchar_t unichar);
     void SetInputEnabled(bool state);
-    void Shutdown();
+    
 };
 
 #endif // RMLUIMANAGER_H

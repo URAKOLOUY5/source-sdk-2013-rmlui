@@ -32,6 +32,7 @@ public:
     virtual void OnKeyCodeReleased(vgui::KeyCode code);
     virtual void OnKeyTyped(wchar_t unichar);;
     virtual void Paint() override;
+    virtual void PaintBackground() override;
 };
 
 #endif // RMLPANEL_H

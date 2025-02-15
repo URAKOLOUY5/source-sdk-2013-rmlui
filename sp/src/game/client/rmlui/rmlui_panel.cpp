@@ -27,6 +27,9 @@ RmlUiPanel::RmlUiPanel()
     MakePopup();
     SetMouseInputEnabled(false);
     SetKeyBoardInputEnabled(false);
+
+    SetBgColor(Color(0, 0, 0, 0));
+    SetFgColor(Color(0, 0, 0, 0));
 }
 
 void RmlUiPanel::OnScreenSizeChanged(int iOldWide, int iOldTall)
@@ -84,5 +87,9 @@ void RmlUiPanel::OnKeyTyped(wchar_t unichar)
 void RmlUiPanel::Paint()
 {
     // Render our rmlui here for this time
-    RmlUIManager::GetInstance()->Render();
+    RmlUIManager::GetInstance()->Render("main");
+}
+
+void RmlUiPanel::PaintBackground()
+{
 }

@@ -15,16 +15,21 @@
 #include "filesystem.h"
 #include "ienginevgui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
+#include "GameUI/IGameUI.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 RmlUIManager* RmlUIManager::instance = nullptr;
-RmlUIManager::RmlUIManager() : pContext(nullptr) {}
+RmlUIManager::RmlUIManager() {}
 
 static RmlUIRenderInterface renderInterface;
 static RmlUiSystemInterface systemInterface;
 static RmlUiFileInterface fileInterface;
+
+// See interface.h/.cpp for specifics:  basically this ensures that we actually Sys_UnloadModule the dll and that we don't call Sys_LoadModule 
+//  over and over again.
+static CDllDemandLoader g_GameUI("GameUI");
 
 /// Create or get singleton instance of this manager
 RmlUIManager* RmlUIManager::GetInstance()
@@ -49,69 +54,67 @@ void RmlUIManager::Init()
 	// Load all fonts in mod's resource folder
 	LoadFontFaces();
 
-	// Create render context with game's screen size
-	pContext = Rml::CreateContext("main", Rml::Vector2i(ScreenWidth(), ScreenHeight()));
-
-	// Initialize debug context
-	Rml::Debugger::Initialise(pContext);
-	
-	// Load base document
-	// NOTE: Since we override RmlUi's FileSystem
-	// we can load files in engine's filesystem (visible to "MOD" search path)
-	Rml::ElementDocument* document = pContext->LoadDocument("rmlui/rml.rml");
-
-	// Show document on screen if we can
-	if (document)
-		document->Show();
-
-	// Create VGUI panel to render at
+	// Create VGUI panel for main menuat
 	// (panel used also to detect mouse input and other stuff)
 	// TODO: If there's better way than using VGUI to rely on input system
-	// let know
+	// let me know
 	rmlPanel = new RmlUiPanel();
+
+	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+	if (gameUIFactory)
+	{
+		IGameUI* m_pGameUI = (IGameUI*)gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
+
+		m_pGameUI->SetMainMenuOverride(rmlPanel->GetVPanel());
+	}
+
+	CreateContext("main", "rmlui/mainmenu.rml");
+	CreateContext("hud", "rmlui/hud.rml");
 }
 
 /// Render all contexts
-void RmlUIManager::Render()
+void RmlUIManager::Render(const char* contextName)
 {
-	if (!pContext)
-		return;
+	Rml::Context* context = contexts[contextName];
 
-	CMatRenderContextPtr pRenderContext(materials);
+	if (context)
+	{
+		CMatRenderContextPtr pRenderContext(materials);
 
-	// Disable depth write
-	pRenderContext->OverrideDepthEnable(true, false);
+		// Disable depth write
+		pRenderContext->OverrideDepthEnable(true, false);
 
-	// Ortho matrix
-	pRenderContext->MatrixMode(MATERIAL_MODEL);
-	pRenderContext->PushMatrix();
-	pRenderContext->LoadIdentity();
+		// Ortho matrix
+		pRenderContext->MatrixMode(MATERIAL_MODEL);
+		pRenderContext->PushMatrix();
+		pRenderContext->LoadIdentity();
 
-	pRenderContext->MatrixMode(MATERIAL_PROJECTION);
-	pRenderContext->PushMatrix();
+		pRenderContext->MatrixMode(MATERIAL_PROJECTION);
+		pRenderContext->PushMatrix();
 
-	// Disable previous transform
-	renderInterface.DisableTransform();
+		// Disable previous transform
+		renderInterface.DisableTransform();
 
-	// Render contexts
-	pContext->Update();
-	pContext->Render();
+		// Render contexts
+		context->Update();
+		context->Render();
 
-	// Restore matrices
-	pRenderContext->MatrixMode(MATERIAL_MODEL);
-	pRenderContext->PopMatrix();
+		// Restore matrices
+		pRenderContext->MatrixMode(MATERIAL_MODEL);
+		pRenderContext->PopMatrix();
 
-	pRenderContext->MatrixMode(MATERIAL_PROJECTION);
-	pRenderContext->PopMatrix();
+		pRenderContext->MatrixMode(MATERIAL_PROJECTION);
+		pRenderContext->PopMatrix();
 
-	// Restore override write to depth
-	pRenderContext->OverrideDepthEnable(false, false);
+		// Restore override write to depth
+		pRenderContext->OverrideDepthEnable(false, false);
+	}
 }
 
 /// Called when resolution changes
 void RmlUIManager::OnScreenSizeChanged(int iOldWide, int iOldTall)
 {
-	pContext->SetDimensions(Rml::Vector2i(ScreenWidth(), ScreenHeight()));
+	//pContext->SetDimensions(Rml::Vector2i(ScreenWidth(), ScreenHeight()));
 }
 
 static Rml::Input::KeyIdentifier ConvertKeyCodeTo(ButtonCode_t keynum)
@@ -233,19 +236,19 @@ static int GetMouseButtonIndex(vgui::MouseCode code)
 /// Called when key code pressed
 void RmlUIManager::OnKeyCodePressed(ButtonCode_t keynum)
 {
-	pContext->ProcessKeyDown(ConvertKeyCodeTo(keynum), GetKeyModifiers());
+	//pContext->ProcessKeyDown(ConvertKeyCodeTo(keynum), GetKeyModifiers());
 }
 
 /// Called when key code released
 void RmlUIManager::OnKeyCodeReleased(ButtonCode_t keynum)
 {
-	pContext->ProcessKeyUp(ConvertKeyCodeTo(keynum), GetKeyModifiers());
+	//pContext->ProcessKeyUp(ConvertKeyCodeTo(keynum), GetKeyModifiers());
 }
 
 void RmlUIManager::OnKeyTyped(wchar_t unichar)
 {
-	if (unichar != 8)
-		pContext->ProcessTextInput(static_cast<Rml::Character>(unichar));
+	//if (unichar != 8)
+		//pContext->ProcessTextInput(static_cast<Rml::Character>(unichar));
 }
 
 void RmlUIManager::SetInputEnabled(bool state)
@@ -256,17 +259,17 @@ void RmlUIManager::SetInputEnabled(bool state)
 
 void RmlUIManager::OnCursorMoved(int x, int y)
 {
-	Msg("OnCursorMoved X: %i, Y: %i", x, y);
+	//Msg("OnCursorMoved X: %i, Y: %i", x, y);
 
-	bool mouseMove = pContext->ProcessMouseMove(x, y, GetKeyModifiers());
+	//bool mouseMove = pContext->ProcessMouseMove(x, y, GetKeyModifiers());
 
-	Msg("mouseMoveHit == %s\n", mouseMove ? "true" : "false");
+	//Msg("mouseMoveHit == %s\n", mouseMove ? "true" : "false");
 }
 
 void RmlUIManager::OnMousePressed(vgui::MouseCode code)
 {
 	Msg("%i %i \n", GetMouseButtonIndex(code), code);
-	pContext->ProcessMouseButtonDown(GetMouseButtonIndex(code), GetKeyModifiers());
+	//pContext->ProcessMouseButtonDown(GetMouseButtonIndex(code), GetKeyModifiers());
 }
 
 void RmlUIManager::OnMouseDoublePressed(vgui::MouseCode code)
@@ -275,14 +278,14 @@ void RmlUIManager::OnMouseDoublePressed(vgui::MouseCode code)
 
 void RmlUIManager::OnMouseReleased(vgui::MouseCode code)
 {
-	pContext->ProcessMouseButtonUp(GetMouseButtonIndex(code), GetKeyModifiers());
+	//pContext->ProcessMouseButtonUp(GetMouseButtonIndex(code), GetKeyModifiers());
 }
 
 void RmlUIManager::OnMouseWheeled(int delta)
 {
 	// Apply vertical delta
 	// Invert delta to scroll properly
-	pContext->ProcessMouseWheel(Rml::Vector2f(0, -delta), GetKeyModifiers());
+	//pContext->ProcessMouseWheel(Rml::Vector2f(0, -delta), GetKeyModifiers());
 }
 
 /// Shutdown
@@ -291,6 +294,37 @@ void RmlUIManager::Shutdown()
 	delete rmlPanel;
 	rmlPanel = nullptr;
 	Rml::Shutdown();
+}
+
+/// Load the document and attach it to specified vgui panel
+/// and create new context for it
+Rml::Context* RmlUIManager::CreateContext(const char* contextName, Rml::String documentName)
+{
+	if (contexts[contextName])
+	{
+		Rml::Log::Message(Rml::Log::LT_ERROR, "Context with name %s already exists", contextName);
+		return nullptr;
+	}
+
+	Rml::Context* newContext = Rml::CreateContext(contextName, Rml::Vector2i(ScreenWidth(), ScreenHeight()));
+	Rml::ElementDocument* document = newContext->LoadDocument(documentName);
+	document->Show();
+
+	contexts[contextName] = newContext;
+
+	return newContext;
+}
+
+/// Retrieve context by name if found
+Rml::Context* RmlUIManager::GetContext(const char* contextName)
+{
+	if (contexts[contextName])
+	{
+		Rml::Context* context = contexts[contextName];
+		return context;
+	}
+
+	return nullptr;
 }
 
 /// Load all font files in mod
