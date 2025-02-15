@@ -23,6 +23,7 @@ ipch
 *.vpc_crc
 *.sln
 *.sentinel
+*.pdb
 
 # Visual Studio build results
 *[Dd]ebug*/
@@ -72,7 +73,6 @@ filelistgen.txt
 filelist.txt
 
 # Mod folders
-*/game/*/bin/*.pdb
 */game/*/bin/*.so.dbg
 */game/*/cfg/config.cfg
 */game/*/cfg/server_blacklist.txt
