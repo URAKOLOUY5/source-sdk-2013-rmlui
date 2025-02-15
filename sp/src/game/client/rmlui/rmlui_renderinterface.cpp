@@ -38,6 +38,7 @@ class TextureHandle
 public:
     CTextureReference texture;
     CMaterialReference material;
+    KeyValues* keyvalues;
 };
 
 // Functions for gradient shader (match parameters of rmlui_gradient pixel shader)
@@ -75,7 +76,7 @@ void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, 
         pVMTKeyValues->SetInt("$ignorez", 1); // Ignore depth
         pVMTKeyValues->SetInt("$translucent", 1); // Enable transparency
         pVMTKeyValues->SetInt("$no_fullbright", 1); // Ignore fullbright
-        IMaterial* mat = g_pMaterialSystem->FindProceduralMaterial("__rml_geometry", TEXTURE_GROUP_OTHER, pVMTKeyValues);
+        IMaterial* mat = g_pMaterialSystem->CreateMaterial("__rml_geometry", pVMTKeyValues);
         m_pGeometryMaterial.Init(mat);
     }
 
@@ -198,6 +199,7 @@ Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(Rml::Span<const Rml::by
     
     handle->texture.Init(pTexture);
     pTexture->Download(); // Generate texture now
+    pTexture->IncrementReferenceCount();
   
     // Setup material to bind it later
     KeyValues* pVMTKeyValues = new KeyValues("UnlitGeneric");
@@ -207,9 +209,11 @@ Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(Rml::Span<const Rml::by
     pVMTKeyValues->SetInt("$ignorez", 1); // Ignore depth
     pVMTKeyValues->SetInt("$translucent", 1); // Enable transparency
     pVMTKeyValues->SetInt("$no_fullbright", 1); // Ignore fullbright
-    IMaterial* pMaterial = materials->CreateMaterial(pName, pVMTKeyValues);
+    IMaterial* pMaterial = materials->FindProceduralMaterial(pName, TEXTURE_GROUP_OTHER, pVMTKeyValues);
+    pMaterial->IncrementReferenceCount();
 
     handle->material.Init(pMaterial);
+    handle->keyvalues = pVMTKeyValues;
 
     return reinterpret_cast<Rml::TextureHandle>(handle);
 }
@@ -254,15 +258,29 @@ void RmlUIRenderInterface::ReleaseTexture(Rml::TextureHandle texture)
     {
         CMaterialReference materialRef = handle->material;
         CTextureReference textureRef = handle->texture;
+        KeyValues* keyValuesRef = handle->keyvalues;
+
+        const char* name = materialRef->GetName();
 
         if (textureRef)
         {
+            Msg("textureRef.Shutdown\n");
             textureRef->SetTextureRegenerator(NULL);
-            textureRef.Shutdown();
+            textureRef->DecrementReferenceCount();
         }
 
         if (materialRef)
+        {
+            Msg("MaterialRef.Shutdown\n");
+            materialRef->DecrementReferenceCount();
             materialRef.Shutdown();
+        }
+
+        if (keyValuesRef)
+        {
+            Msg("keyValuesRef->deleteThis\n");
+            keyValuesRef->deleteThis();
+        }
 
         delete handle;
     }
@@ -459,7 +477,9 @@ Rml::CompiledShaderHandle RmlUIRenderInterface::CompileShader(const Rml::String&
         }
 
         IMaterial* mat = g_pMaterialSystem->FindProceduralMaterial(pMaterialName, TEXTURE_GROUP_OTHER, pVMTKeyValues);
+        mat->IncrementReferenceCount();
         shaderHandle->material.Init(mat);
+        shaderHandle->keyvalues = pVMTKeyValues;
     }
     else
     {

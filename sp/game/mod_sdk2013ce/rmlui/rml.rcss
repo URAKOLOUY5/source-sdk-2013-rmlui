@@ -102,3 +102,21 @@ thead, tbody, tfoot {
 /*
 * Mod's styles
 */
+
+@keyframes damage-overlay-anim {
+    0% {
+        decorator: radial-gradient(100% 100%, rgba(0, 0, 0, 0) 25%, rgba(128, 0, 0, 200) 55%, rgba(45, 13, 4, 255) 70%);
+    }
+    50% {
+        decorator: radial-gradient(100% 100%, rgba(0, 0, 0, 0) 25%, rgba(128, 0, 0, 0) 100%, rgba(45, 13, 4, 16) 70%);
+    }
+    100% {
+        decorator: radial-gradient(100% 100%, rgba(0, 0, 0, 0) 25%, rgba(128, 0, 0, 200) 55%, rgba(45, 13, 4, 255) 70%);
+    }
+}
+
+.damage-overlay {
+	animation: 2s linear-in-out infinite forward damage-overlay-anim;
+	width: 64px;
+	height: 64px;
+}

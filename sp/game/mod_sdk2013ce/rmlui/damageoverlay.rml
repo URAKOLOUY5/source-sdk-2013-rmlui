@@ -1,0 +1,7 @@
+<template name="damageoverlay">
+<head>
+	<link type="text/rcss" href="rml.rcss"/>
+</head>
+<body class="damage-overlay">
+</body>
+</template>
