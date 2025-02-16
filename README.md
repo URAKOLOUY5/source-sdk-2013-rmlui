@@ -33,8 +33,8 @@
 |     | Clipboard    | Expose clipboard functionality                               |
 |     | Lua    | Add lua plugin integration                               |
 |     | SVG    | Add svg plugin integration                               |
-|     | Png    | Add libpng/other integration                               |
-|     | Jpeg   | Add libjpeg/other integration                               |
+| ✅   | Png    | Add libpng/other integration                               |
+| ✅   | Jpeg   | Add libjpeg/other integration                               |
 |     | video_services   | Add webm/bink/other integration                               |
 
 # How to compile
@@ -52,5 +52,6 @@ Check **Issues** tab for more info!
 - **[source-sdk-2013-ce](https://github.com/Nbc66/source-sdk-2013-ce)** - repository is based on this project and forked off
 - **[RmlUI](https://github.com/mikke89/RmlUi)** - framework itself, compiled as dynamic library using CMake (temp solution, later I want to integrate RmlUI as submodule and setup CMake here) + samples + wiki
 - **[SCell555's ShaderCompiler](https://github.com/SCell555/ShaderCompile)** - standalone shadercompile without dependencies on external tools (Perl, DxSDK)
+- **[stb_image.h, stb_image_resize2.h](https://github.com/nothings/stb)** - used for image decoding and resizing
 
 Check `thirdpartylegalnotices.txt` for licenses.

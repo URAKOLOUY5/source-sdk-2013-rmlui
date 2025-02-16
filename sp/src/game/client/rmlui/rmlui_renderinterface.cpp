@@ -11,6 +11,11 @@
 #include "rmlui_renderinterface.h"
 #include "bitmap/tgaloader.h"
 #include "filesystem.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include <stb_image_resize2.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -218,35 +223,89 @@ Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(Rml::Span<const Rml::by
     return reinterpret_cast<Rml::TextureHandle>(handle);
 }
 
+static int NextPowerOfTwo(int value)
+{
+    int power = 1;
+    while (power < value) {
+        power *= 2;
+    }
+    return power;
+}
+
 /// Called by RmlUi when a texture is required by the library.
 Rml::TextureHandle RmlUIRenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
 {
-    // Allocate a CUtlMemory to hold the RGBA8888 image data.
-    CUtlMemory<unsigned char> outputData;
-    int outWidth = 0, outHeight = 0;
-
-    // Load the TGA image data in RGBA8888 format.
-    // TGALoader::LoadRGBA8888 will fill outputData and return true on success.
-    if (!TGALoader::LoadRGBA8888(source.c_str(), outputData, outWidth, outHeight))
+    // Open the file
+    FileHandle_t fileHandle = g_pFullFileSystem->Open(source.c_str(), "rb");
+    if (fileHandle == FILESYSTEM_INVALID_HANDLE)
     {
-        // If the TGA file could not be loaded, return an empty texture handle.
+        // If the file could not be opened, return an empty texture handle.
         return Rml::TextureHandle();
     }
 
-    // Update the texture dimensions based on the loaded image.
-    texture_dimensions.x = outWidth;
-    texture_dimensions.y = outHeight;
+    // Get the file size
+    int fileSize = g_pFullFileSystem->Size(fileHandle);
+    if (fileSize <= 0)
+    {
+        g_pFullFileSystem->Close(fileHandle);
+        return Rml::TextureHandle();
+    }
 
-    // Compute the total number of bytes in the image.
-    // We expect 4 bytes per pixel (RGBA8888).
-    size_t dataSize = static_cast<size_t>(outWidth * outHeight * 4);
+    // Allocate memory to read the file
+    unsigned char* fileData = new unsigned char[fileSize];
+    if (!fileData)
+    {
+        g_pFullFileSystem->Close(fileHandle);
+        return Rml::TextureHandle();
+    }
 
-    // Create a span from the loaded image data.
-    // Rml::byte is assumed to be equivalent to unsigned char.
-    Rml::Span<const Rml::byte> imageDataSpan(reinterpret_cast<Rml::byte*>(outputData.Base()), dataSize);
+    // Read the file into memory
+    g_pFullFileSystem->Read(fileData, fileSize, fileHandle);
+    g_pFullFileSystem->Close(fileHandle);
 
-    // Call your existing GenerateTexture function, which creates a procedural texture from the image data.
-    return GenerateTexture(imageDataSpan, Rml::Vector2i(outWidth, outHeight));
+    // Load image using stb_image from memory
+    int width, height, channels;
+    unsigned char* imageData = stbi_load_from_memory(fileData, fileSize, &width, &height, &channels, 4); // Force RGBA8888
+    delete[] fileData;
+
+    if (!imageData)
+        return Rml::TextureHandle();
+
+    // Ensure texture dimensions are power of two
+    int pot_width = NextPowerOfTwo(width);
+    int pot_height = NextPowerOfTwo(height);
+
+    // Resize only if necessary
+    unsigned char* resizedData = imageData;
+    if (pot_width != width || pot_height != height)
+    {
+        resizedData = new unsigned char[pot_width * pot_height * 4];
+        stbir_resize_uint8_srgb(imageData, width, height, 0, resizedData, pot_width, pot_height, 0, STBIR_RGBA);
+    }
+
+    // Update texture dimensions
+    texture_dimensions.x = pot_width;
+    texture_dimensions.y = pot_height;
+
+    // Compute the total size of the image data
+    size_t dataSize = static_cast<size_t>(width * height * 4);
+
+    // Create a span from the loaded image data
+    Rml::Span<const Rml::byte> imageDataSpan(reinterpret_cast<Rml::byte*>(imageData), dataSize);
+
+    // Generate the texture
+    Rml::TextureHandle textureHandle = GenerateTexture(
+        Rml::Span<const Rml::byte>(reinterpret_cast<Rml::byte*>(resizedData), static_cast<size_t>(pot_width * pot_height * 4)),
+        Rml::Vector2i(pot_width, pot_height)
+    );
+
+    // Free the image data
+    stbi_image_free(imageData);
+
+    if (resizedData != imageData)
+        delete[] resizedData;
+
+    return textureHandle;
 }
 
 /// Called by RmlUi when a loaded or generated texture is no longer required.
@@ -516,39 +575,70 @@ void RmlUIRenderInterface::DisableTransform()
 /// Generate texture
 void RmlUIProceduralRegenerator::RegenerateTextureBits(ITexture* pTexture, IVTFTexture* pVTFTexture, Rect_t* pSubRect)
 {
+    // Texture properties and expected data size.
+    int textureWidth = pVTFTexture->Width();
+    int textureHeight = pVTFTexture->Height();
+    const int bytesPerPixel = 4; // RGBA
+    int expectedSize = textureWidth * textureHeight * bytesPerPixel;
+
+    // Validate the data buffer.
+    if (dataBuffer.empty() || static_cast<int>(dataBuffer.size()) < expectedSize)
+    {
+        Error("RmlUIProceduralRegenerator: Invalid dataBuffer size. Expected at least %d bytes, got %d bytes.",
+            expectedSize, static_cast<int>(dataBuffer.size()));
+        return;
+    }
+
+    // Validate the sub-rectangle bounds.
+    if (pSubRect->x < 0 || pSubRect->y < 0 ||
+        pSubRect->x + pSubRect->width > textureWidth ||
+        pSubRect->y + pSubRect->height > textureHeight)
+    {
+        Error("RmlUIProceduralRegenerator: Sub-rectangle [%d, %d, %d, %d] is out of texture bounds [%d x %d].",
+            pSubRect->x, pSubRect->y, pSubRect->width, pSubRect->height, textureWidth, textureHeight);
+        return;
+    }
+
+    // Set up the pixel writer for the destination texture.
     CPixelWriter pixelWriter;
     pixelWriter.SetPixelMemory(pVTFTexture->Format(),
-        pVTFTexture->ImageData(0, 0, 0), pVTFTexture->RowSizeInBytes(0));
+        pVTFTexture->ImageData(0, 0, 0),
+        pVTFTexture->RowSizeInBytes(0));
 
-    if (!dataBuffer.size())
-        Error("RmlUIProceduralRegenerator: Failed to regenerate texture bits - data is invalid");
+    // Calculate the stride (bytes per row) of the source image.
+    int stride = textureWidth * bytesPerPixel;
 
-    int bytesPerPixel = 4; // 4 bytes per pixel RGBA
-    int stride = pVTFTexture->Width() * bytesPerPixel; // Row size in bytes
-    int dataSize = stride * pVTFTexture->Height(); // Total texture size in bytes
+    // Compute the bounds for the sub-rectangle.
+    int xEnd = pSubRect->x + pSubRect->width;
+    int yEnd = pSubRect->y + pSubRect->height;
 
-    int xmax = pSubRect->x + pSubRect->width; // Right bound
-    int ymax = pSubRect->y + pSubRect->height; // Top bound
-
-    for (int y = pSubRect->y; y < ymax; ++y)
+    // Loop over each row in the sub-rectangle.
+    for (int y = pSubRect->y; y < yEnd; ++y)
     {
+        // Calculate the starting index for this row.
+        int rowStartIndex = y * stride;
+
+        // Move the pixel writer to the beginning of the destination row.
         pixelWriter.Seek(pSubRect->x, y);
 
-        for (int x = pSubRect->x; x < xmax; ++x)
+        // Process each pixel in the sub-rectangle.
+        for (int x = pSubRect->x; x < xEnd; ++x)
         {
-            int srcIndex = (y * stride) + (x * bytesPerPixel);
-
-            if (srcIndex < 0 || (srcIndex + 3) >= dataSize)
+            int srcIndex = rowStartIndex + (x * bytesPerPixel);
+            if (srcIndex + bytesPerPixel > static_cast<int>(dataBuffer.size()))
             {
-                Error("RmlUIProceduralRegenerator: Out of bounds read at index %d (max: %d)\n", srcIndex, dataSize);
+                Error("RmlUIProceduralRegenerator: Out of bounds read at index %d (buffer size: %d)",
+                    srcIndex, static_cast<int>(dataBuffer.size()));
                 return;
             }
 
+            // Read RGBA components from the source data.
             Rml::byte r = dataBuffer[srcIndex + 0];
             Rml::byte g = dataBuffer[srcIndex + 1];
             Rml::byte b = dataBuffer[srcIndex + 2];
             Rml::byte a = dataBuffer[srcIndex + 3];
 
+            // Write the pixel to the destination texture.
             pixelWriter.WritePixel(r, g, b, a);
         }
     }
