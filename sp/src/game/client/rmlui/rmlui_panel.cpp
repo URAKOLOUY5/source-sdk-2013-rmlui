@@ -23,13 +23,6 @@ RmlUiPanel::RmlUiPanel()
     vgui::surface()->GetScreenSize(screenWide, screenTall);
     SetPos(0, 0);
     SetSize(screenWide, screenTall);
-
-    MakePopup();
-    SetMouseInputEnabled(false);
-    SetKeyBoardInputEnabled(false);
-
-    SetBgColor(Color(0, 0, 0, 0));
-    SetFgColor(Color(0, 0, 0, 0));
 }
 
 void RmlUiPanel::OnScreenSizeChanged(int iOldWide, int iOldTall)

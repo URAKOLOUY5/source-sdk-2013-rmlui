@@ -58,18 +58,22 @@ void RmlUIManager::Init()
 	// (panel used also to detect mouse input and other stuff)
 	// TODO: If there's better way than using VGUI to rely on input system
 	// let me know
-	rmlPanel = new RmlUiPanel();
-
-	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
-	if (gameUIFactory)
+	if (g_pFullFileSystem->FileExists("rmlui/mainmenu.rml", "MOD"))
 	{
-		IGameUI* m_pGameUI = (IGameUI*)gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
+		rmlPanel = new RmlUiPanel();
 
-		m_pGameUI->SetMainMenuOverride(rmlPanel->GetVPanel());
+		CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+		if (gameUIFactory)
+		{
+			IGameUI* m_pGameUI = (IGameUI*)gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
+			m_pGameUI->SetMainMenuOverride(rmlPanel->GetVPanel());
+		}
+
+		CreateContext("main", "rmlui/mainmenu.rml");
 	}
-
-	CreateContext("main", "rmlui/mainmenu.rml");
-	CreateContext("hud", "rmlui/hud.rml");
+	
+	if (g_pFullFileSystem->FileExists("rmlui/hud.rml", "MOD"))
+		CreateContext("hud", "rmlui/hud.rml");
 }
 
 /// Render all contexts
@@ -291,7 +295,14 @@ void RmlUIManager::OnMouseWheeled(int delta)
 /// Shutdown
 void RmlUIManager::Shutdown()
 {
-	delete rmlPanel;
+	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+	if (gameUIFactory)
+	{
+		IGameUI* m_pGameUI = (IGameUI*)gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
+		m_pGameUI->SetMainMenuOverride(NULL);
+	}
+
+	rmlPanel->DeletePanel();
 	rmlPanel = nullptr;
 	Rml::Shutdown();
 }
