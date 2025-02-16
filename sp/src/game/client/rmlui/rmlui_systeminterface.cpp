@@ -10,6 +10,7 @@
 #include "rmlui_systeminterface.h"
 #include "vgui/IInput.h"
 #include "vgui/Cursor.h"
+#include "vgui/ILocalize.h"
 #include "vgui_controls/Controls.h"
 #include <locale>
 #include <codecvt>
