@@ -724,6 +724,7 @@ void CBaseViewport::Paint()
 	}
 
 #ifdef RMLUI
-	RmlUIManager::GetInstance()->Render("hud");
+	if (!engine->IsLevelMainMenuBackground() && !engine->IsPaused())
+		RmlUIManager::GetInstance()->Render("hud");
 #endif
 }

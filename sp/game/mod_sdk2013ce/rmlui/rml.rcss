@@ -109,6 +109,9 @@ thead, tbody, tfoot {
 	top: 50%;
 	left: 60dp;
 	width: 200px;
+	background-color: rgba(0,0,0,64);
+	padding: 6px;
+	border-radius: 6px;
 }
 
 .main-menu-logo {
