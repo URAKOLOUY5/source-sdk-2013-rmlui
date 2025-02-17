@@ -130,7 +130,7 @@ thead, tbody, tfoot {
 	margin-bottom: 3px;
 	font-weight: bold;
 	font-size: 15dp;
-	transition: background-color border 0.1s linear-in-out;
+	transition: background-color border transform 0.1s linear-in-out;
 	cursor: pointer;
 	box-sizing: border-box;
 }
@@ -141,6 +141,7 @@ thead, tbody, tfoot {
 	border-color: orange;
 	border-bottom: 2px orange;
 	color: orange;
+	transform: skewX(-15deg);
 }
 
 .menu-button:active
