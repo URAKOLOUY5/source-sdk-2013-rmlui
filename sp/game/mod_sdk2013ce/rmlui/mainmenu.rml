@@ -4,6 +4,6 @@
 	<link type="text/template" href="damageoverlay.rml" />
 </head>
 <body>
-	<h1>Welcome to RmlUi</h1>	
+	<h1>#RmlUI_Welcome_Menu</h1>	
 </body>
 </rml>
