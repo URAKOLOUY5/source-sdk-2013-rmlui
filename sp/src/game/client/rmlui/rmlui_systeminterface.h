@@ -26,6 +26,7 @@ class RmlUiSystemInterface : public Rml::SystemInterface {
 	bool LogMessage(Rml::Log::Type type, const Rml::String& message) override;
 	void JoinPath(Rml::String& translated_path, const Rml::String& document_path, const Rml::String& path) override;
 	void SetMouseCursor(const Rml::String& cursor_name) override;
+	int TranslateString(Rml::String& translated, const Rml::String& input) override;
 };
 
 #endif

@@ -10,7 +10,10 @@
 #include "rmlui_systeminterface.h"
 #include "vgui/IInput.h"
 #include "vgui/Cursor.h"
+#include "vgui/ILocalize.h"
 #include "vgui_controls/Controls.h"
+#include <locale>
+#include <codecvt>
 
 #ifdef WIN32
 #pragma warning(push)
@@ -100,4 +103,39 @@ void RmlUiSystemInterface::SetMouseCursor(const Rml::String& cursor_name)
         cursor_code = vgui::CursorCode::dc_blank; // Default to system cursor
 
     vgui::input()->SetCursorOveride(cursor_code);
+}
+
+int RmlUiSystemInterface::TranslateString(Rml::String& translated, const Rml::String& input)
+{
+    if (input[0] == '#')
+    {
+
+        std::wstring ws;
+        wchar_t* szText = g_pVGuiLocalize->Find(input.c_str());
+
+        if (!szText)
+        {
+            SystemInterface::TranslateString(translated, input);
+            return 0;
+        }
+
+        ws = szText;
+
+        // Convert wstring to string using some C++11 magic
+        using convert_type = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_type, wchar_t> converter;
+
+        std::string localizedString = converter.to_bytes(ws);
+
+        if (!localizedString.empty())
+        {
+            // Sorta hack, call base class TranslateString with input of localized string
+            SystemInterface::TranslateString(translated, localizedString);
+            return 1;
+        }
+    }
+
+    // Sorta hack, setting translatied to input causes heap corruption (C++ in nutshell)
+    SystemInterface::TranslateString(translated, input);
+    return 0;
 }
