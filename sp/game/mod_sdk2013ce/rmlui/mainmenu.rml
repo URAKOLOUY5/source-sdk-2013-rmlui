@@ -4,6 +4,13 @@
 	<link type="text/template" href="damageoverlay.rml" />
 </head>
 <body>
-	<h1>#RmlUI_Welcome_Menu</h1>	
+	<div class="main-menu-logo"/>
+	<div class="main-menu">
+		<button class="menu-button">#GameUI_GameMenu_NewGame</button>
+		<button class="menu-button">#GameUI_GameMenu_LoadGame</button>
+		<button class="menu-button">#GameUI_GameMenu_SaveGame</button>
+		<button class="menu-button">#GameUI_GameMenu_Options</button>
+		<button class="menu-button">#GameUI_GameMenu_Quit</button>
+	</div>
 </body>
 </rml>

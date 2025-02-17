@@ -8,7 +8,6 @@ body {
 	font-size: 16px;
 	width: 100%;
 	height: 100%;
-	decorator: image( image.png cover );
 }
 
 div
@@ -103,21 +102,47 @@ thead, tbody, tfoot {
 * Mod's styles
 */
 
-@keyframes damage-overlay-anim {
-    0% {
-        decorator: radial-gradient(100% 100%, rgba(0, 0, 0, 0) 25%, rgba(128, 0, 0, 200) 55%, rgba(45, 13, 4, 255) 70%);
-    }
-    50% {
-        decorator: radial-gradient(100% 100%, rgba(0, 0, 0, 0) 25%, rgba(128, 0, 0, 0) 100%, rgba(45, 13, 4, 16) 70%);
-    }
-    100% {
-        decorator: radial-gradient(100% 100%, rgba(0, 0, 0, 0) 25%, rgba(128, 0, 0, 200) 55%, rgba(45, 13, 4, 255) 70%);
-    }
+.main-menu {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	top: 50%;
+	left: 60dp;
+	width: 200px;
 }
 
-.damage-overlay {
-	animation: 2s linear-in-out infinite forward damage-overlay-anim;
-	width: 100%;
-	height: 100%;
+.main-menu-logo {
+	decorator: image(logo.png fill);
+	width: 287dp;
+	height: 91dp;
 	position: absolute;
+	top: 38%;
+	left: 60dp;
+}
+
+.menu-button {
+	background-color: rgba(0,0,0,128);
+	border-radius: 10px;
+	padding: 9px;
+	margin-bottom: 3px;
+	font-weight: bold;
+	font-size: 15dp;
+	transition: background-color border 0.1s linear-in-out;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.menu-button:hover
+{
+	background-color: rgba(192,192,192,128);
+	border-color: orange;
+	border-bottom: 2px orange;
+	color: orange;
+}
+
+.menu-button:active
+{
+	background-color: rgba(255,255,255,200);
+	color: black;
+	border-color: black;
 }
