@@ -26,7 +26,7 @@
 # System features:
 |     | Feature      | Description                                                  |
 | --- | ------------ | ------------------------------------------------------------ |
-|     | Localization | Expose localization from engine                              |
+| ✅  | Localization | Expose localization from engine                              |
 | ✅   | FileSystem   | Expose filesystem from engine (`MOD` search path)           |
 | ✅   | Logging      | Expose console logging (and system messages **WIN32 ONLY**) |
 | ✅   | Cursors      | Allow using `cursor` property in CSS                         |
@@ -53,5 +53,8 @@ Check **Issues** tab for more info!
 - **[RmlUI](https://github.com/mikke89/RmlUi)** - framework itself, compiled as dynamic library using CMake (temp solution, later I want to integrate RmlUI as submodule and setup CMake here) + samples + wiki
 - **[SCell555's ShaderCompiler](https://github.com/SCell555/ShaderCompile)** - standalone shadercompile without dependencies on external tools (Perl, DxSDK)
 - **[stb_image.h, stb_image_resize2.h](https://github.com/nothings/stb)** - used for image decoding and resizing
+
+# Contributors
+- [Alivebyte](https://github.com/Alivebyte)
 
 Check `thirdpartylegalnotices.txt` for licenses.
