@@ -120,7 +120,18 @@ void RmlUIManager::Render(const char* contextName)
 /// Called when resolution changes
 void RmlUIManager::OnScreenSizeChanged(int iOldWide, int iOldTall)
 {
-	//pContext->SetDimensions(Rml::Vector2i(ScreenWidth(), ScreenHeight()));
+	int w = ScreenWidth();
+	int h = ScreenHeight();
+
+	// Update resolution only for menu and hud contexts
+	Rml::Context* menuContext = GetContext("main");
+	Rml::Context* hudContext = GetContext("hud");
+
+	if (menuContext)
+		menuContext->SetDimensions(Rml::Vector2i(w, h));
+
+	if (hudContext)
+		hudContext->SetDimensions(Rml::Vector2i(w, h));
 }
 
 static Rml::Input::KeyIdentifier ConvertKeyCodeTo(ButtonCode_t keynum)
