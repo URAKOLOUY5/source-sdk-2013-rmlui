@@ -61,10 +61,6 @@ compile_commands.json
 !makefile_base_posix.mak
 !sourcesdk_def.mak
 
-# RmlUI ignored thirdparty files
-*/src/thirdparty/rmlui_build
-*/src/thirdparty/RmlUi
-
 # Shader build files (legacy)
 uniquefilestocopy.txt
 vcslist.txt
