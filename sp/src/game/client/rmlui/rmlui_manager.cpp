@@ -95,6 +95,8 @@ void RmlUIManager::Render(const char* contextName)
 
 		pRenderContext->MatrixMode(MATERIAL_PROJECTION);
 		pRenderContext->PushMatrix();
+		pRenderContext->LoadIdentity();
+		pRenderContext->Ortho(0, ScreenHeight(), ScreenWidth(), 0, -1000, 1000);
 
 		// Disable previous transform
 		renderInterface.DisableTransform();
