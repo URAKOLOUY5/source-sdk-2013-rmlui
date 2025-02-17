@@ -240,19 +240,32 @@ static int GetMouseButtonIndex(vgui::MouseCode code)
 /// Called when key code pressed
 void RmlUIManager::OnKeyCodePressed(ButtonCode_t keynum)
 {
-	//pContext->ProcessKeyDown(ConvertKeyCodeTo(keynum), GetKeyModifiers());
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
+
+	context->ProcessKeyDown(ConvertKeyCodeTo(keynum), GetKeyModifiers());
 }
 
 /// Called when key code released
 void RmlUIManager::OnKeyCodeReleased(ButtonCode_t keynum)
 {
-	//pContext->ProcessKeyUp(ConvertKeyCodeTo(keynum), GetKeyModifiers());
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
+	
+	context->ProcessKeyUp(ConvertKeyCodeTo(keynum), GetKeyModifiers());
 }
 
 void RmlUIManager::OnKeyTyped(wchar_t unichar)
 {
-	//if (unichar != 8)
-		//pContext->ProcessTextInput(static_cast<Rml::Character>(unichar));
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
+	
+	// Ignore backspace
+	if (unichar != 8)
+		context->ProcessTextInput(static_cast<Rml::Character>(unichar));
 }
 
 void RmlUIManager::SetInputEnabled(bool state)
@@ -263,17 +276,20 @@ void RmlUIManager::SetInputEnabled(bool state)
 
 void RmlUIManager::OnCursorMoved(int x, int y)
 {
-	//Msg("OnCursorMoved X: %i, Y: %i", x, y);
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
 
-	//bool mouseMove = pContext->ProcessMouseMove(x, y, GetKeyModifiers());
-
-	//Msg("mouseMoveHit == %s\n", mouseMove ? "true" : "false");
+	context->ProcessMouseMove(x, y, GetKeyModifiers());
 }
 
 void RmlUIManager::OnMousePressed(vgui::MouseCode code)
 {
-	Msg("%i %i \n", GetMouseButtonIndex(code), code);
-	//pContext->ProcessMouseButtonDown(GetMouseButtonIndex(code), GetKeyModifiers());
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
+
+	context->ProcessMouseButtonDown(GetMouseButtonIndex(code), GetKeyModifiers());
 }
 
 void RmlUIManager::OnMouseDoublePressed(vgui::MouseCode code)
@@ -282,14 +298,22 @@ void RmlUIManager::OnMouseDoublePressed(vgui::MouseCode code)
 
 void RmlUIManager::OnMouseReleased(vgui::MouseCode code)
 {
-	//pContext->ProcessMouseButtonUp(GetMouseButtonIndex(code), GetKeyModifiers());
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
+	
+	context->ProcessMouseButtonUp(GetMouseButtonIndex(code), GetKeyModifiers());
 }
 
 void RmlUIManager::OnMouseWheeled(int delta)
 {
+	Rml::Context* context = GetContext("main");
+	if (!context)
+		return;
+
 	// Apply vertical delta
 	// Invert delta to scroll properly
-	//pContext->ProcessMouseWheel(Rml::Vector2f(0, -delta), GetKeyModifiers());
+	context->ProcessMouseWheel(Rml::Vector2f(0, -delta), GetKeyModifiers());
 }
 
 /// Shutdown
