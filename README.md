@@ -54,7 +54,7 @@ Check **Issues** tab for more info!
 - **[SCell555's ShaderCompiler](https://github.com/SCell555/ShaderCompile)** - standalone shadercompile without dependencies on external tools (Perl, DxSDK)
 - **[stb_image.h, stb_image_resize2.h](https://github.com/nothings/stb)** - used for image decoding and resizing
 
+Check `thirdpartylegalnotices.txt` for licenses.
+
 # Contributors
 - [Alivebyte](https://github.com/Alivebyte)
-
-Check `thirdpartylegalnotices.txt` for licenses.
