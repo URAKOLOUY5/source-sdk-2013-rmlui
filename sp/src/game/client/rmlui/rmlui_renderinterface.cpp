@@ -20,9 +20,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+/// Render wireframe instead of geometry
 ConVar rmlui_wireframe("rmlui_wireframe", "0", FCVAR_CHEAT, "Render wireframe instead of geometry");
-
-#define MAX_NUM_STOPS 16
 
 #define GRADIENT_LINEAR             0
 #define GRADIENT_RADIAL             1
@@ -45,7 +44,6 @@ public:
     CMaterialReference material;
     KeyValues* keyvalues;
 };
-
 
 Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(
     Rml::Span<const Rml::Vertex> vertices,
@@ -123,9 +121,9 @@ void RmlUIRenderInterface::RenderGeometry(
     meshBuilder.Begin(pMesh, MATERIAL_TRIANGLES, handle->vertices.size(), handle->indices.size());
 
     // In RmlUi mesh consists of triangles (3 vertices per triangle)
-    //  Each vertex position is a pixel coordinate
-    //  The coordinate system of documents in RmlUi places the origin at the top-left corner of the window (same for DirectX).
-    //  The generated textures in RmlUi use the convention with the origin placed at the bottom-left corner. (haven't checked, it works btw)
+    //  - Each vertex position is a pixel coordinate
+    //  - The coordinate system of documents in RmlUi places the origin at the top-left corner of the window (same for DirectX).
+    //  - The generated textures in RmlUi use the convention with the origin placed at the bottom-left corner. (haven't checked, it works btw)
     for (const auto& vertex : handle->vertices)
     {
         meshBuilder.Position3f(vertex.position.x, vertex.position.y, 0);
@@ -156,7 +154,6 @@ void RmlUIRenderInterface::RenderGeometry(
 
     pRenderContext->PopMatrix();
 }
-
 
 void RmlUIRenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
 {
