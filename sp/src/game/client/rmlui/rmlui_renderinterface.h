@@ -16,7 +16,6 @@
 #include <RmlUi/Core/Core.h>
 #include "RmlUi/Core/RenderInterface.h"
 #include <RmlUi/Core/Types.h>
-#include <rmlui/Core.h>
 #include <RmlUi/Core/DecorationTypes.h>
 
 #ifdef DBGFLAG_ASSERT
@@ -31,40 +30,6 @@
 #include "vtf/vtf.h"
 #include "tier1/utldict.h"
 
-class RmlRenderLayerStack {
-public:
-	RmlRenderLayerStack();
-	~RmlRenderLayerStack();
-
-	Rml::LayerHandle PushLayer();
-	void PopLayer();
-	ITexture* GetLayer(Rml::LayerHandle layer) const;
-	ITexture* GetTopLayer() const;
-	Rml::LayerHandle GetTopLayerHandle() const;
-
-	ITexture* GetPostprocessPrimary() { return EnsureFramebufferPostprocess(0); }
-	ITexture* GetPostprocessSecondary() { return EnsureFramebufferPostprocess(1); }
-	ITexture* GetPostprocessTertiary() { return EnsureFramebufferPostprocess(2); }
-	ITexture* GetBlendMask() { return EnsureFramebufferPostprocess(3); }
-
-	void SwapPostprocessPrimarySecondary();
-
-	void BeginFrame(int new_width, int new_height);
-	void EndFrame();
-
-private:
-	void DestroyFramebuffers();
-	ITexture* EnsureFramebufferPostprocess(int index);
-	int width = 0, height = 0;
-	
-	// The number of active layers is manually tracked since we re-use the framebuffers stored in the fb_layers stack.
-	int layersSize = 0;
-
-	Rml::Vector<ITexture*> fbLayers;
-	Rml::Vector<ITexture*> fbPostProcess;
-
-};
-
 class RmlUIRenderInterface : public Rml::RenderInterface {
 private:
 	CMaterialReference m_pGeometryMaterial;
@@ -72,16 +37,10 @@ private:
 	VMatrix transform;
 	bool transformEnabled;
 	int stencilTestValue;
-	RmlRenderLayerStack renderLayers;
-
-	void BlitLayerToPostprocessPrimary(Rml::LayerHandle layer_handle);
-	void RenderFilters(Rml::Span<const Rml::CompiledFilterHandle> filter_handles);
 
 public:
 
 	// Inherited via RenderInterface
-	void BeginFrame();
-	void EndFrame();
 	Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 	void RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
 	void ReleaseGeometry(Rml::CompiledGeometryHandle geometry) override;
@@ -97,14 +56,6 @@ public:
 	void RenderShader(Rml::CompiledShaderHandle shader, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
 	void ReleaseShader(Rml::CompiledShaderHandle shader) override;
 	void DisableTransform();
-	Rml::LayerHandle PushLayer() override;
-	void PopLayer() override;
-	void CompositeLayers(Rml::LayerHandle source,
-		Rml::LayerHandle destination,
-		Rml::BlendMode blend_mode,
-		Rml::Span<const Rml::CompiledFilterHandle> filters) override;
-	Rml::CompiledFilterHandle CompileFilter(const Rml::String& name, const Rml::Dictionary& parameters) override;
-	void ReleaseFilter(Rml::CompiledFilterHandle filter) override;
 };
 #endif
 

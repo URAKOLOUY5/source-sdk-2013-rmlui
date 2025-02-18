@@ -133,7 +133,6 @@ thead, tbody, tfoot {
 	transition: background-color border transform 0.1s linear-in-out;
 	cursor: pointer;
 	box-sizing: border-box;
-	backdrop-filter: blur(50px);
 }
 
 .menu-button:hover

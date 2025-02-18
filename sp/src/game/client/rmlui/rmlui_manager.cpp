@@ -85,12 +85,35 @@ void RmlUIManager::Render(const char* contextName)
 	{
 		CMatRenderContextPtr pRenderContext(materials);
 
-		renderInterface.BeginFrame();
+		// Disable depth write
+		pRenderContext->OverrideDepthEnable(true, false);
 
+		// Ortho matrix
+		pRenderContext->MatrixMode(MATERIAL_MODEL);
+		pRenderContext->PushMatrix();
+		pRenderContext->LoadIdentity();
+
+		pRenderContext->MatrixMode(MATERIAL_PROJECTION);
+		pRenderContext->PushMatrix();
+		pRenderContext->LoadIdentity();
+		pRenderContext->Ortho(0, ScreenHeight(), ScreenWidth(), 0, -1000, 1000);
+
+		// Disable previous transform
+		renderInterface.DisableTransform();
+
+		// Render contexts
 		context->Update();
 		context->Render();
 
-		renderInterface.EndFrame();
+		// Restore matrices
+		pRenderContext->MatrixMode(MATERIAL_MODEL);
+		pRenderContext->PopMatrix();
+
+		pRenderContext->MatrixMode(MATERIAL_PROJECTION);
+		pRenderContext->PopMatrix();
+
+		// Restore override write to depth
+		pRenderContext->OverrideDepthEnable(false, false);
 	}
 }
 
