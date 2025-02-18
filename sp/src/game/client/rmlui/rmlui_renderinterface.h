@@ -37,6 +37,7 @@ private:
 	VMatrix transform;
 	bool transformEnabled;
 	int stencilTestValue;
+	CMatRenderContextPtr pRenderContext;
 
 public:
 	void BeginFrame();

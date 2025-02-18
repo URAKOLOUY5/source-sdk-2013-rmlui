@@ -31,8 +31,6 @@ ConVar rmlui_wireframe("rmlui_wireframe", "0", FCVAR_CHEAT, "Render wireframe in
 #define GRADIENT_REPEATING_RADIAL   4
 #define GRADIENT_REPEATING_CONIC    5
 
-CMatRenderContextPtr pRenderContext;
-
 class GeometryHandle
 {
 public:
