@@ -46,7 +46,7 @@ public:
     KeyValues* keyvalues;
 };
 
-/// Called by RmlUi when it wants to compile geometry to be rendered later.
+
 Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
 {
     auto* handle = new GeometryHandle();
@@ -56,9 +56,6 @@ Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(Rml::Span<cons
     return reinterpret_cast<Rml::CompiledGeometryHandle>(handle);
 }
 
-/// Called by RmlUi when it wants to render geometry.
-/// It creates mesh, renders it and destroys it 
-/// each call
 void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture)
 {
     auto* handle = reinterpret_cast<GeometryHandle*>(geometry);
@@ -153,7 +150,7 @@ void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, 
     pRenderContext->PopMatrix();
 }
 
-/// Called by RmlUi when it wants to release geometry.
+
 void RmlUIRenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
 {
     auto* handle = reinterpret_cast<GeometryHandle*>(geometry);
@@ -162,7 +159,6 @@ void RmlUIRenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
         delete handle;
 }
 
-/// Called by RmlUi when a texture is required to be generated from a sequence of pixels in memory (for example, fonts)
 Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions)
 {
     TextureHandle* handle = new TextureHandle();
@@ -223,7 +219,6 @@ static int NextPowerOfTwo(int value)
     return power;
 }
 
-/// Called by RmlUi when a texture is required by the library.
 Rml::TextureHandle RmlUIRenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
 {
     // Open the file
@@ -299,7 +294,6 @@ Rml::TextureHandle RmlUIRenderInterface::LoadTexture(Rml::Vector2i& texture_dime
     return textureHandle;
 }
 
-/// Called by RmlUi when a loaded or generated texture is no longer required.
 void RmlUIRenderInterface::ReleaseTexture(Rml::TextureHandle texture)
 {
     TextureHandle* handle = reinterpret_cast<TextureHandle*>(texture);
@@ -332,20 +326,17 @@ void RmlUIRenderInterface::ReleaseTexture(Rml::TextureHandle texture)
     }
 }
 
-/// Called by RmlUi when it wants to enable or disable scissoring to clip content.
 void RmlUIRenderInterface::EnableScissorRegion(bool enable)
 {
 	pRenderContext->SetScissorRect(0, 0, ScreenWidth(), ScreenHeight(), enable);
 
 }
 
-/// Called by RmlUi when it wants to change the scissor region.
 void RmlUIRenderInterface::SetScissorRegion(Rml::Rectanglei region)
 {
     pRenderContext->SetScissorRect(region.Left(), region.Top(), region.Right(), region.Bottom(), true);
 }
 
-/// Called by RmlUi when it wants the renderer to use a new transform matrix.
 void RmlUIRenderInterface::SetTransform(const Rml::Matrix4f* newTransform)
 {
     transformEnabled = (newTransform != nullptr);
@@ -365,14 +356,11 @@ void RmlUIRenderInterface::SetTransform(const Rml::Matrix4f* newTransform)
     }
 }
 
-/// Called by RmlUi when it wants to enable or disable the clip mask.
 void RmlUIRenderInterface::EnableClipMask(bool enable)
 {
     pRenderContext->SetStencilEnable(enable);
 }
 
-/// Called by RmlUi when it wants to set or modify the contents of the clip mask.
-/// Reference: https://github.com/mikke89/RmlUi/blob/b48abfbd5fc333d9a5c201c1a4b2a3f5881308e8/Backends/RmlUi_Renderer_GL2.cpp#L163
 void RmlUIRenderInterface::RenderToClipMask(Rml::ClipMaskOperation operation, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation)
 {
     auto* handle = reinterpret_cast<GeometryHandle*>(geometry);
@@ -426,7 +414,7 @@ void RmlUIRenderInterface::RenderToClipMask(Rml::ClipMaskOperation operation, Rm
     pRenderContext->SetStencilReferenceValue(stencilTestValue);
 }
 
-/// Called by RmlUi when it wants to compile a new shader.
+
 Rml::CompiledShaderHandle RmlUIRenderInterface::CompileShader(const Rml::String& name, const Rml::Dictionary& parameters)
 {
     TextureHandle* shaderHandle = new TextureHandle();
@@ -584,7 +572,6 @@ void RmlUIRenderInterface::EndFrame()
     pRenderContext->OverrideDepthEnable(false, false);
 }
 
-/// Generate texture
 void RmlUIProceduralRegenerator::RegenerateTextureBits(ITexture* pTexture, IVTFTexture* pVTFTexture, Rect_t* pSubRect)
 {
     // Texture properties and expected data size.
@@ -656,14 +643,14 @@ void RmlUIProceduralRegenerator::RegenerateTextureBits(ITexture* pTexture, IVTFT
     }
 }
 
-/// Release (nothing to remove)
 void RmlUIProceduralRegenerator::Release()
 {
 }
 
-/// Set data
+
 void RmlUIProceduralRegenerator::SetData(const Rml::byte* _data, size_t dataSize)
 {
     dataBuffer.assign(_data, _data + dataSize);
     dataBuffer.shrink_to_fit();
 }
+

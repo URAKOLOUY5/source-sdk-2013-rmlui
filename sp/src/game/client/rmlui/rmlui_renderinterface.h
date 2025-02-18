@@ -40,23 +40,61 @@ private:
 	CMatRenderContextPtr pRenderContext;
 
 public:
+	// ---------------------------- Our methods ----------------------------
+
 	void BeginFrame();
 	void EndFrame();
 
-	// Inherited via RenderInterface
+	// ------------------------------ Geometry -----------------------------
+
+	/// Called by RmlUi when it wants to compile geometry to be rendered later.
 	Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
+
+	/// Called by RmlUi when it wants to render geometry.
+	/// It creates mesh, renders it and destroys it 
+	/// each call
 	void RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
+
+	/// Called by RmlUi when it wants to release geometry.
 	void ReleaseGeometry(Rml::CompiledGeometryHandle geometry) override;
-	Rml::TextureHandle LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source) override;
+	
+	// ------------------------------ Textures -----------------------------
+
+	/// Called by RmlUi when a texture is required to be generated from a sequence of pixels in memory (for example, fonts)
 	Rml::TextureHandle GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions) override;
+	
+	/// Called by RmlUi when a texture is required by the library.
+	Rml::TextureHandle LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source) override;
+
+	/// Called by RmlUi when a loaded or generated texture is no longer required.
 	void ReleaseTexture(Rml::TextureHandle texture) override;
+	
+	// ----------------------- Clipping & Transforms -----------------------
+
+	/// Called by RmlUi when it wants to enable or disable scissoring to clip content.
 	void EnableScissorRegion(bool enable) override;
+
+	/// Called by RmlUi when it wants to change the scissor region.
 	void SetScissorRegion(Rml::Rectanglei region) override;
+
+	/// Called by RmlUi when it wants the renderer to use a new transform matrix.
 	void SetTransform(const Rml::Matrix4f* newTransform) override;
+
+	/// Called by RmlUi when it wants to enable or disable the clip mask.
 	void EnableClipMask(bool enable) override;
+
+	/// Called by RmlUi when it wants to set or modify the contents of the clip mask.
 	void RenderToClipMask(Rml::ClipMaskOperation operation, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation) override;
+
+	// ------------------------------ Shaders ------------------------------
+	
+	/// Called by RmlUi when it wants to compile a new shader.
 	Rml::CompiledShaderHandle CompileShader(const Rml::String& name, const Rml::Dictionary& parameters) override;
+
+	/// Called by RmlUi when it wants to render created shader.
 	void RenderShader(Rml::CompiledShaderHandle shader, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
+
+	/// Called by RmlUi when it wants to release (destroy) created shader.
 	void ReleaseShader(Rml::CompiledShaderHandle shader) override;
 };
 #endif
@@ -69,8 +107,13 @@ private:
 
 public:
 	RmlUIProceduralRegenerator(void) {}
-	virtual void RegenerateTextureBits(ITexture* pTexture, IVTFTexture* pVTFTexture, Rect_t* pSubRect);
-	virtual void Release(void);
 
+	/// Generate texture
+	virtual void RegenerateTextureBits(ITexture* pTexture, IVTFTexture* pVTFTexture, Rect_t* pSubRect) override;
+
+	/// Release (nothing to remove)
+	virtual void Release(void) override;
+
+	/// Set data
 	void SetData(const Rml::byte* _data, size_t dataSize);
 };
