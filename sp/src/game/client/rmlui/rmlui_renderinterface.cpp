@@ -47,7 +47,10 @@ public:
 };
 
 
-Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
+Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(
+    Rml::Span<const Rml::Vertex> vertices,
+    Rml::Span<const int> indices
+)
 {
     auto* handle = new GeometryHandle();
     handle->vertices = vertices;
@@ -56,7 +59,11 @@ Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(Rml::Span<cons
     return reinterpret_cast<Rml::CompiledGeometryHandle>(handle);
 }
 
-void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture)
+void RmlUIRenderInterface::RenderGeometry(
+    Rml::CompiledGeometryHandle geometry,
+    Rml::Vector2f translation,
+    Rml::TextureHandle texture
+)
 {
     auto* handle = reinterpret_cast<GeometryHandle*>(geometry);
     if (!handle)
@@ -159,7 +166,10 @@ void RmlUIRenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
         delete handle;
 }
 
-Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions)
+Rml::TextureHandle RmlUIRenderInterface::GenerateTexture(
+    Rml::Span<const Rml::byte> source,
+    Rml::Vector2i source_dimensions
+)
 {
     TextureHandle* handle = new TextureHandle();
 
@@ -219,7 +229,10 @@ static int NextPowerOfTwo(int value)
     return power;
 }
 
-Rml::TextureHandle RmlUIRenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
+Rml::TextureHandle RmlUIRenderInterface::LoadTexture(
+    Rml::Vector2i& texture_dimensions,
+    const Rml::String& source
+)
 {
     // Open the file
     FileHandle_t fileHandle = g_pFullFileSystem->Open(source.c_str(), "rb");
@@ -361,7 +374,11 @@ void RmlUIRenderInterface::EnableClipMask(bool enable)
     pRenderContext->SetStencilEnable(enable);
 }
 
-void RmlUIRenderInterface::RenderToClipMask(Rml::ClipMaskOperation operation, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation)
+void RmlUIRenderInterface::RenderToClipMask(
+    Rml::ClipMaskOperation operation,
+    Rml::CompiledGeometryHandle geometry,
+    Rml::Vector2f translation
+)
 {
     auto* handle = reinterpret_cast<GeometryHandle*>(geometry);
     if (!handle)
@@ -415,7 +432,10 @@ void RmlUIRenderInterface::RenderToClipMask(Rml::ClipMaskOperation operation, Rm
 }
 
 
-Rml::CompiledShaderHandle RmlUIRenderInterface::CompileShader(const Rml::String& name, const Rml::Dictionary& parameters)
+Rml::CompiledShaderHandle RmlUIRenderInterface::CompileShader(
+    const Rml::String& name,
+    const Rml::Dictionary& parameters
+)
 {
     TextureHandle* shaderHandle = new TextureHandle();
     CMaterialReference material;
@@ -517,7 +537,12 @@ Rml::CompiledShaderHandle RmlUIRenderInterface::CompileShader(const Rml::String&
     return reinterpret_cast<Rml::CompiledShaderHandle>(shaderHandle);
 }
 
-void RmlUIRenderInterface::RenderShader(Rml::CompiledShaderHandle shader, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle /*texture*/)
+void RmlUIRenderInterface::RenderShader(
+    Rml::CompiledShaderHandle shader,
+    Rml::CompiledGeometryHandle geometry,
+    Rml::Vector2f translation,
+    Rml::TextureHandle /*texture*/
+)
 {
     Rml::TextureHandle textureHandle = reinterpret_cast<Rml::TextureHandle>(reinterpret_cast<TextureHandle*>(shader));
 
@@ -527,7 +552,9 @@ void RmlUIRenderInterface::RenderShader(Rml::CompiledShaderHandle shader, Rml::C
     RenderGeometry(geometry, translation, textureHandle);
 }
 
-void RmlUIRenderInterface::ReleaseShader(Rml::CompiledShaderHandle shader)
+void RmlUIRenderInterface::ReleaseShader(
+    Rml::CompiledShaderHandle shader
+)
 {
     Rml::TextureHandle textureHandle = reinterpret_cast<Rml::TextureHandle>(reinterpret_cast<TextureHandle*>(shader));
 
@@ -572,7 +599,11 @@ void RmlUIRenderInterface::EndFrame()
     pRenderContext->OverrideDepthEnable(false, false);
 }
 
-void RmlUIProceduralRegenerator::RegenerateTextureBits(ITexture* pTexture, IVTFTexture* pVTFTexture, Rect_t* pSubRect)
+void RmlUIProceduralRegenerator::RegenerateTextureBits(
+    ITexture* pTexture,
+    IVTFTexture* pVTFTexture,
+    Rect_t* pSubRect
+)
 {
     // Texture properties and expected data size.
     int textureWidth = pVTFTexture->Width();
