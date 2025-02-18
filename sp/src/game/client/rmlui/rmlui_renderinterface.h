@@ -39,6 +39,8 @@ private:
 	int stencilTestValue;
 
 public:
+	void BeginFrame();
+	void EndFrame();
 
 	// Inherited via RenderInterface
 	Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
@@ -55,7 +57,6 @@ public:
 	Rml::CompiledShaderHandle CompileShader(const Rml::String& name, const Rml::Dictionary& parameters) override;
 	void RenderShader(Rml::CompiledShaderHandle shader, Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
 	void ReleaseShader(Rml::CompiledShaderHandle shader) override;
-	void DisableTransform();
 };
 #endif
 

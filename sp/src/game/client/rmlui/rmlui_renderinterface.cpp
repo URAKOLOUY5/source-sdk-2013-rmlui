@@ -559,10 +559,39 @@ void RmlUIRenderInterface::ReleaseShader(Rml::CompiledShaderHandle shader)
     ReleaseTexture(textureHandle);
 }
 
-/// Disable transform
-void RmlUIRenderInterface::DisableTransform()
+void RmlUIRenderInterface::BeginFrame()
 {
+    CMatRenderContextPtr pRenderContext(materials);
+
     transformEnabled = false;
+
+    // Disable depth write
+    pRenderContext->OverrideDepthEnable(true, false);
+
+    // Ortho matrix
+    pRenderContext->MatrixMode(MATERIAL_MODEL);
+    pRenderContext->PushMatrix();
+    pRenderContext->LoadIdentity();
+
+    pRenderContext->MatrixMode(MATERIAL_PROJECTION);
+    pRenderContext->PushMatrix();
+    pRenderContext->LoadIdentity();
+    pRenderContext->Ortho(0, ScreenHeight(), ScreenWidth(), 0, -1000, 1000);
+}
+
+void RmlUIRenderInterface::EndFrame()
+{
+    CMatRenderContextPtr pRenderContext(materials);
+    
+    // Restore matrices
+    pRenderContext->MatrixMode(MATERIAL_MODEL);
+    pRenderContext->PopMatrix();
+
+    pRenderContext->MatrixMode(MATERIAL_PROJECTION);
+    pRenderContext->PopMatrix();
+
+    // Restore override write to depth
+    pRenderContext->OverrideDepthEnable(false, false);
 }
 
 /// Generate texture
