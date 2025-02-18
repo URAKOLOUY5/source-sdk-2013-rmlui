@@ -46,13 +46,6 @@ public:
     KeyValues* keyvalues;
 };
 
-// Functions for gradient shader (match parameters of rmlui_gradient pixel shader)
-enum class ShaderGradientFunction { Linear, Radial, Conic, RepeatingLinear, RepeatingRadial, RepeatingConic };
-
-// Type of compiled shader geometry
-// There's room for custom decorator shaders
-enum class CompiledShaderType { Invalid = 0, Gradient };
-
 /// Called by RmlUi when it wants to compile geometry to be rendered later.
 Rml::CompiledGeometryHandle RmlUIRenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
 {
