@@ -31,6 +31,8 @@ ConVar rmlui_wireframe("rmlui_wireframe", "0", FCVAR_CHEAT, "Render wireframe in
 #define GRADIENT_REPEATING_RADIAL   4
 #define GRADIENT_REPEATING_CONIC    5
 
+CMatRenderContextPtr pRenderContext;
+
 class GeometryHandle
 {
 public:
@@ -84,8 +86,6 @@ void RmlUIRenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, 
         IMaterial* wireframeRef = materials->FindMaterial("debug/debugwireframevertexcolor", TEXTURE_GROUP_OTHER);
         m_pWireframeMaterial.Init(wireframeRef);
     }
-
-    CMatRenderContextPtr pRenderContext(materials);
 
     pRenderContext->MatrixMode(MATERIAL_MODEL);
     pRenderContext->PushMatrix();
@@ -337,7 +337,6 @@ void RmlUIRenderInterface::ReleaseTexture(Rml::TextureHandle texture)
 /// Called by RmlUi when it wants to enable or disable scissoring to clip content.
 void RmlUIRenderInterface::EnableScissorRegion(bool enable)
 {
-	CMatRenderContextPtr pRenderContext(materials);
 	pRenderContext->SetScissorRect(0, 0, ScreenWidth(), ScreenHeight(), enable);
 
 }
@@ -345,14 +344,12 @@ void RmlUIRenderInterface::EnableScissorRegion(bool enable)
 /// Called by RmlUi when it wants to change the scissor region.
 void RmlUIRenderInterface::SetScissorRegion(Rml::Rectanglei region)
 {
-	CMatRenderContextPtr pRenderContext(materials);
     pRenderContext->SetScissorRect(region.Left(), region.Top(), region.Right(), region.Bottom(), true);
 }
 
 /// Called by RmlUi when it wants the renderer to use a new transform matrix.
 void RmlUIRenderInterface::SetTransform(const Rml::Matrix4f* newTransform)
 {
-    CMatRenderContextPtr pRenderContext(materials);
     transformEnabled = (newTransform != nullptr);
 
     if (newTransform)
@@ -373,7 +370,6 @@ void RmlUIRenderInterface::SetTransform(const Rml::Matrix4f* newTransform)
 /// Called by RmlUi when it wants to enable or disable the clip mask.
 void RmlUIRenderInterface::EnableClipMask(bool enable)
 {
-    CMatRenderContextPtr pRenderContext(materials);
     pRenderContext->SetStencilEnable(enable);
 }
 
@@ -384,8 +380,6 @@ void RmlUIRenderInterface::RenderToClipMask(Rml::ClipMaskOperation operation, Rm
     auto* handle = reinterpret_cast<GeometryHandle*>(geometry);
     if (!handle)
         return;
-
-    CMatRenderContextPtr pRenderContext(materials);
 
     // Disable color writes so that only the stencil buffer is modified.
     pRenderContext->OverrideColorWriteEnable(true, false);
@@ -543,8 +537,6 @@ void RmlUIRenderInterface::RenderShader(Rml::CompiledShaderHandle shader, Rml::C
 
     if (!textureHandle)
         return;
-
-    CMatRenderContextPtr pRenderContext(materials);
     
     RenderGeometry(geometry, translation, textureHandle);
 }
@@ -561,9 +553,11 @@ void RmlUIRenderInterface::ReleaseShader(Rml::CompiledShaderHandle shader)
 
 void RmlUIRenderInterface::BeginFrame()
 {
-    CMatRenderContextPtr pRenderContext(materials);
-
     transformEnabled = false;
+
+    // Set render context once before first render call
+    if (!pRenderContext)
+        pRenderContext.GetFrom(materials);
 
     // Disable depth write
     pRenderContext->OverrideDepthEnable(true, false);
@@ -581,8 +575,6 @@ void RmlUIRenderInterface::BeginFrame()
 
 void RmlUIRenderInterface::EndFrame()
 {
-    CMatRenderContextPtr pRenderContext(materials);
-    
     // Restore matrices
     pRenderContext->MatrixMode(MATERIAL_MODEL);
     pRenderContext->PopMatrix();
